@@ -116,13 +116,16 @@
     <aside id="sidebar" class="w-64 bg-meta-navy/90 backdrop-blur-xl border-r border-gray-800 flex flex-col z-40 shadow-2xl absolute md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
         
         <!-- Logo -->
-        <div class="h-20 flex items-center justify-between px-6 border-b border-gray-800">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-meta-violet to-meta-mint flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.3)]">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                <span class="font-display font-bold text-white tracking-wide text-lg">MetaGie</span>
-            </div>
+        <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+    <div class="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center">
+        <img 
+            src="logo.png" 
+            alt="MetaGie Logo" 
+            class="w-full h-full object-contain"
+        />
+    </div>
+    <span class="font-display font-bold text-white text-xl tracking-wide">MetaGie</span>
+</div>
             <!-- Close Sidebar Mobile -->
             <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
                 <i class="ph ph-x text-xl"></i>
