@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaGie Innovations | Ecosystem Dashboard</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for Wallet Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- MetaGie Theme Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        meta: {
+                            navy: '#0B1120',
+                            dark: '#0f172a',
+                            violet: '#8B5CF6',
+                            mint: '#34D399',
+                            coral: '#FB7185',
+                            surface: 'rgba(30, 41, 59, 0.7)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0B1120; color: #cbd5e1; overflow: hidden; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.15) 0%, transparent 100%);
+            border-left-color: #8B5CF6;
+            color: #fff;
+        }
+        .nav-item.active i { color: #8B5CF6; }
+
+        /* Hide views by default */
+        .app-view { display: none; }
+        .app-view.active { display: block; animation: fadeIn 0.4s ease-out forwards; }
+
+        /* Glass Toast Notification */
+        #toast {
+            visibility: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        #toast.show {
+            visibility: visible;
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="h-screen flex text-sm antialiased selection:bg-meta-violet selection:text-white relative">
+
+    <!-- Ambient Background -->
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-meta-violet/10 rounded-full filter blur-[100px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-meta-mint/5 rounded-full filter blur-[100px]"></div>
+    </div>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside id="sidebar" class="w-64 bg-meta-navy/90 backdrop-blur-xl border-r border-gray-800 flex flex-col z-40 shadow-2xl absolute md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        
+        <!-- Logo -->
+        <div class="h-20 flex items-center justify-between px-6 border-b border-gray-800">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-meta-violet to-meta-mint flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <span class="font-display font-bold text-white tracking-wide text-lg">MetaGie</span>
+            </div>
+            <!-- Close Sidebar Mobile -->
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-6 overflow-y-auto">
+            <p class="px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">My Workspace</p>
+            
+            <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active flex items-center px-6 py-3 font-medium text-gray-400 cursor-pointer">
+                <i class="ph-fill ph-squares-four text-xl mr-3 transition-colors"></i> Dashboard
+            </a>
+            <a href="#" onclick="switchView('wallet')" id="nav-wallet" class="nav-item flex items-center px-6 py-3 font-medium text-gray-400 cursor-pointer justify-between">
+                <div class="flex items-center">
+                    <i class="ph-fill ph-wallet text-xl mr-3 transition-colors"></i> Escrow Wallet
+                </div>
+                <span class="w-2 h-2 rounded-full bg-meta-mint shadow-[0_0_5px_#34D399]"></span>
+            </a>
+            
+            <div class="h-px bg-gray-800 my-4 mx-6"></div>
+            <p class="px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Ecosystem</p>
+
+            <a href="#" onclick="switchView('marketplace')" id="nav-marketplace" class="nav-item flex items-center px-6 py-3 font-medium text-gray-400 cursor-pointer">
+                <i class="ph-fill ph-shopping-cart text-xl mr-3 transition-colors"></i> Marketplace
+            </a>
+            <a href="#" onclick="switchView('services')" id="nav-services" class="nav-item flex items-center px-6 py-3 font-medium text-gray-400 cursor-pointer">
+                <i class="ph-fill ph-toolbox text-xl mr-3 transition-colors"></i> Expert Services
+            </a>
+            
+            <div class="h-px bg-gray-800 my-4 mx-6"></div>
+            <p class="px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Innovations</p>
+
+            <a href="#" onclick="switchView('ideahub')" id="nav-ideahub" class="nav-item flex items-center px-6 py-3 font-medium text-gray-400 cursor-pointer">
+                <i class="ph-fill ph-lightbulb text-xl mr-3 transition-colors"></i> The Idea Hub
+            </a>
+            <a href="#" onclick="switchView('devmarket')" id="nav-devmarket" class="nav-item flex items-center px-6 py-3 font-medium text-gray-400 cursor-pointer">
+                <i class="ph-fill ph-code-block text-xl mr-3 transition-colors"></i> Dev Profiles
+            </a>
+        </nav>
+
+        <!-- User Profile Bottom -->
+        <div class="p-4 border-t border-gray-800 bg-gray-900/30">
+            <div class="flex items-center justify-between cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors" onclick="switchView('settings')">
+                <div class="flex items-center">
+                    <img class="h-10 w-10 rounded-full border-2 border-meta-mint p-0.5 object-cover" src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="User">
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-white">Aliyu Musa</p>
+                        <p class="text-xs text-meta-mint flex items-center gap-1"><i class="ph-fill ph-seal-check"></i> Verified User</p>
+                    </div>
+                </div>
+                <i class="ph ph-caret-right text-gray-500"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden backdrop-blur-sm"></div>
+
+    <!-- ================= MAIN CONTENT AREA ================= -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+        
+        <!-- Header -->
+        <header class="h-20 flex items-center justify-between px-6 lg:px-10 border-b border-gray-800 glass-panel z-20 sticky top-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <div>
+                    <h2 id="page-title" class="text-xl font-display font-bold text-white tracking-wide">Ecosystem Dashboard</h2>
+                    <p class="text-xs text-gray-500 hidden sm:block">Bauchi State Hub Connection: <span class="text-meta-mint">Secure</span></p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 lg:gap-6">
+                <!-- Search -->
+                <div class="relative hidden md:block">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"></i>
+                    <input type="text" class="bg-gray-800/50 border border-gray-700 text-sm rounded-full pl-10 pr-4 py-2 text-gray-300 focus:outline-none focus:border-meta-violet w-64 transition-all" placeholder="Search products, services, ideas...">
+                </div>
+
+                <!-- Notifications -->
+                <button class="relative p-2 text-gray-400 hover:text-white transition-colors">
+                    <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-meta-coral animate-pulse"></span>
+                    <i class="ph-fill ph-bell text-2xl"></i>
+                </button>
+                
+                <!-- Escrow Quick Balance -->
+                <button onclick="switchView('wallet')" class="hidden sm:flex items-center gap-3 bg-gray-800/50 border border-gray-700 hover:border-meta-mint px-4 py-2 rounded-full transition-all group">
+                    <div class="flex flex-col text-right">
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Escrow Locked</span>
+                        <span class="text-sm font-bold text-white group-hover:text-meta-mint transition-colors">₦45,000</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-meta-mint/20 flex items-center justify-center">
+                        <i class="ph-fill ph-lock-key text-meta-mint"></i>
+                    </div>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Views Container -->
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10 pb-24">
+            
+            <!-- ================= VIEW 1: DASHBOARD ================= -->
+            <div id="view-dashboard" class="app-view active space-y-8 animate-slide-up">
+                
+                <!-- Welcome Banner (Developer Market Theme Applied visually) -->
+                <div class="rounded-2xl p-8 relative overflow-hidden bg-gradient-to-r from-meta-violet to-indigo-900 border border-meta-violet/50 shadow-lg">
+                    <!-- Abstract code background for Dev Theme vibe -->
+                    <div class="absolute inset-0 opacity-10 font-mono text-xs p-4 pointer-events-none break-words overflow-hidden">
+                        const initEcosystem = async () => { await verifyUser(NIN); const escrow = new EscrowLock(amount); await transaction.complete(); return trustScore++; };
+                    </div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div>
+                            <span class="inline-flex items-center gap-1 bg-white/10 px-2 py-1 rounded text-xs text-meta-mint font-bold mb-3 border border-meta-mint/30"><i class="ph-fill ph-paint-brush"></i> Active Profile: Cyberpunk Neon Theme</span>
+                            <h3 class="text-3xl font-display font-bold text-white mb-2">Welcome back, Aliyu!</h3>
+                            <p class="text-indigo-200 text-sm max-w-md">Your trust score is excellent (98/100). You have 1 item arriving today and ₦45,000 secured in escrow.</p>
+                        </div>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <button onclick="switchView('marketplace')" class="flex-1 md:flex-none bg-white text-meta-violet font-bold px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors shadow-lg shadow-white/10">Shop Now</button>
+                            <button onclick="switchView('wallet')" class="flex-1 md:flex-none glass-panel border-white/20 text-white font-bold px-6 py-3 rounded-xl hover:bg-white/10 transition-colors">View Vault</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Modules -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div onclick="switchView('marketplace')" class="glass-panel p-5 rounded-xl cursor-pointer hover:border-blue-500/50 hover:bg-blue-500/5 transition-all text-center group">
+                        <div class="w-12 h-12 mx-auto rounded-full bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="ph-fill ph-shopping-bag text-blue-400 text-2xl"></i></div>
+                        <h4 class="text-white font-medium text-sm">Buy Goods</h4>
+                    </div>
+                    <div onclick="switchView('services')" class="glass-panel p-5 rounded-xl cursor-pointer hover:border-orange-500/50 hover:bg-orange-500/5 transition-all text-center group">
+                        <div class="w-12 h-12 mx-auto rounded-full bg-orange-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="ph-fill ph-wrench text-orange-400 text-2xl"></i></div>
+                        <h4 class="text-white font-medium text-sm">Hire Experts</h4>
+                    </div>
+                    <div onclick="switchView('ideahub')" class="glass-panel p-5 rounded-xl cursor-pointer hover:border-meta-coral/50 hover:bg-meta-coral/5 transition-all text-center group">
+                        <div class="w-12 h-12 mx-auto rounded-full bg-meta-coral/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="ph-fill ph-lightbulb text-meta-coral text-2xl"></i></div>
+                        <h4 class="text-white font-medium text-sm">Pitch Ideas</h4>
+                    </div>
+                    <div onclick="switchView('devmarket')" class="glass-panel p-5 rounded-xl cursor-pointer hover:border-meta-mint/50 hover:bg-meta-mint/5 transition-all text-center group">
+                        <div class="w-12 h-12 mx-auto rounded-full bg-meta-mint/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="ph-fill ph-code text-meta-mint text-2xl"></i></div>
+                        <h4 class="text-white font-medium text-sm">Dev Themes</h4>
+                    </div>
+                </div>
+
+                <!-- Active Escrow Deals -->
+                <div>
+                    <h4 class="text-lg font-display font-bold text-white mb-4">Active Escrow Deals</h4>
+                    <div class="glass-panel rounded-xl border border-gray-700 overflow-hidden">
+                        <div class="p-4 border-b border-gray-800 flex items-center justify-between hover:bg-white/5 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded bg-gray-800 flex items-center justify-center">
+                                    <i class="ph-fill ph-laptop text-gray-400 text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium text-sm">MacBook Pro M2 (Used)</p>
+                                    <p class="text-xs text-gray-500 flex items-center gap-1"><i class="ph-fill ph-storefront text-meta-mint"></i> TechWorld Kano (Verified)</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-meta-violet font-bold text-sm">₦45,000 Locked</p>
+                                <span class="bg-yellow-500/20 text-yellow-500 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wide">In Transit</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 2: ESCROW WALLET ================= -->
+            <div id="view-wallet" class="app-view animate-slide-up">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Available Balance -->
+                    <div class="glass-panel p-6 rounded-2xl border border-meta-mint/30 relative overflow-hidden group">
+                        <div class="absolute right-[-10%] top-[-10%] w-32 h-32 bg-meta-mint/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <p class="text-sm text-gray-400 font-medium uppercase tracking-wider mb-1">Available Balance</p>
+                        <h2 class="text-4xl font-display font-bold text-white mb-6">₦120,500<span class="text-lg text-gray-500">.00</span></h2>
+                        <div class="flex gap-3">
+                            <button class="flex-1 bg-meta-mint text-meta-navy font-bold py-2 rounded-lg hover:bg-white transition-colors text-sm">Top Up</button>
+                            <button class="flex-1 bg-white/10 text-white font-bold py-2 rounded-lg hover:bg-white/20 transition-colors border border-white/10 text-sm">Withdraw</button>
+                        </div>
+                    </div>
+
+                    <!-- Escrow Locked Balance -->
+                    <div class="glass-panel p-6 rounded-2xl border border-meta-violet/30 relative overflow-hidden group">
+                        <div class="absolute right-[-10%] top-[-10%] w-32 h-32 bg-meta-violet/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="flex justify-between items-start mb-1">
+                            <p class="text-sm text-gray-400 font-medium uppercase tracking-wider text-meta-violet">Locked In Escrow</p>
+                            <i class="ph-fill ph-lock-key text-meta-violet text-xl"></i>
+                        </div>
+                        <h2 class="text-4xl font-display font-bold text-white mb-2">₦45,000<span class="text-lg text-gray-500">.00</span></h2>
+                        <p class="text-xs text-gray-400 mb-4">Funds held securely until you confirm delivery.</p>
+                        <button class="w-full bg-meta-violet/20 text-meta-violet font-bold py-2 rounded-lg border border-meta-violet/50 hover:bg-meta-violet hover:text-white transition-colors text-sm">Manage Active Deals (1)</button>
+                    </div>
+
+                    <!-- Trust Score -->
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-700 flex flex-col items-center justify-center text-center">
+                        <div class="relative w-24 h-24 mb-3">
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="none"></circle>
+                                <circle cx="48" cy="48" r="40" stroke="#34D399" stroke-width="8" fill="none" stroke-dasharray="251" stroke-dashoffset="5"></circle>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                <span class="text-2xl font-display font-bold text-white">98</span>
+                            </div>
+                        </div>
+                        <h4 class="text-white font-bold text-sm">Excellent Trust Score</h4>
+                        <p class="text-xs text-gray-500 mt-1">Based on 12 verified transactions</p>
+                    </div>
+                </div>
+
+                <!-- Transaction History -->
+                <h4 class="text-lg font-display font-bold text-white mb-4">Recent Transactions</h4>
+                <div class="glass-panel rounded-xl border border-gray-700 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-800/50 text-xs uppercase text-gray-500 font-medium">
+                            <tr>
+                                <th class="px-6 py-4">Transaction Details</th>
+                                <th class="px-6 py-4 hidden sm:table-cell">Type</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4 text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800 text-sm">
+                            <tr class="hover:bg-white/5 transition-colors">
+                                <td class="px-6 py-4">
+                                    <p class="text-white font-medium">MacBook Pro M2</p>
+                                    <p class="text-xs text-gray-500">Paid to Escrow Vault</p>
+                                </td>
+                                <td class="px-6 py-4 hidden sm:table-cell"><span class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs">Marketplace</span></td>
+                                <td class="px-6 py-4"><span class="text-yellow-500 font-medium text-xs flex items-center gap-1"><i class="ph-fill ph-lock-key"></i> Locked</span></td>
+                                <td class="px-6 py-4 text-right text-white font-bold">-₦45,000</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition-colors">
+                                <td class="px-6 py-4">
+                                    <p class="text-white font-medium">Profile Template: "Neon Glow"</p>
+                                    <p class="text-xs text-gray-500">Purchased from DevMarket</p>
+                                </td>
+                                <td class="px-6 py-4 hidden sm:table-cell"><span class="bg-meta-violet/20 text-meta-violet px-2 py-1 rounded text-xs">Dev Theme</span></td>
+                                <td class="px-6 py-4"><span class="text-meta-mint font-medium text-xs flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> Completed</span></td>
+                                <td class="px-6 py-4 text-right text-white font-bold">-₦5,000</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition-colors">
+                                <td class="px-6 py-4">
+                                    <p class="text-white font-medium">Wallet Deposit</p>
+                                    <p class="text-xs text-gray-500">From Guaranty Trust Bank</p>
+                                </td>
+                                <td class="px-6 py-4 hidden sm:table-cell"><span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">Funding</span></td>
+                                <td class="px-6 py-4"><span class="text-meta-mint font-medium text-xs flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> Success</span></td>
+                                <td class="px-6 py-4 text-right text-meta-mint font-bold">+₦100,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 3: MARKETPLACE ================= -->
+            <div id="view-marketplace" class="app-view animate-slide-up">
+                <!-- Market Filters -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+                    <div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+                        <button class="bg-meta-violet text-white px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap">All Items</button>
+                        <button class="glass-panel text-gray-300 hover:text-white px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap">Electronics</button>
+                        <button class="glass-panel text-gray-300 hover:text-white px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap">Fashion</button>
+                        <button class="glass-panel text-gray-300 hover:text-white px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap">Home & Office</button>
+                    </div>
+                    <div class="glass-panel px-4 py-2 rounded-lg text-sm text-gray-300 flex items-center gap-2 border-meta-mint/30 w-full sm:w-auto">
+                        <i class="ph-fill ph-shield-check text-meta-mint text-lg"></i> 100% Escrow Protected
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Product Card -->
+                    <div class="glass-panel rounded-xl border border-gray-700 overflow-hidden group flex flex-col hover:border-meta-violet transition-colors">
+                        <div class="h-48 bg-gray-800 relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Watch">
+                            <div class="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-white flex items-center gap-1 border border-white/10">
+                                <i class="ph-fill ph-star text-yellow-500"></i> 4.9
+                            </div>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <div class="flex items-center gap-1 mb-1">
+                                <i class="ph-fill ph-seal-check text-meta-mint text-sm"></i>
+                                <span class="text-xs text-gray-400">GadgetsNG • Lagos Hub</span>
+                            </div>
+                            <h4 class="text-white font-medium mb-2 leading-tight">Apple Watch Series 8 (Midnight)</h4>
+                            <div class="mt-auto pt-4 flex items-end justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 line-through">₦220,000</p>
+                                    <p class="text-lg font-display font-bold text-meta-mint">₦195,000</p>
+                                </div>
+                                <button onclick="triggerPurchase('Apple Watch Series 8', '195,000')" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-meta-violet hover:shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all">
+                                    <i class="ph-bold ph-shopping-cart text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Card -->
+                    <div class="glass-panel rounded-xl border border-gray-700 overflow-hidden group flex flex-col hover:border-meta-violet transition-colors">
+                        <div class="h-48 bg-gray-800 relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Laptop">
+                            <div class="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-white flex items-center gap-1 border border-white/10">
+                                <i class="ph-fill ph-star text-yellow-500"></i> 4.7
+                            </div>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <div class="flex items-center gap-1 mb-1">
+                                <i class="ph-fill ph-seal-check text-meta-mint text-sm"></i>
+                                <span class="text-xs text-gray-400">TechWorld • Kano Hub</span>
+                            </div>
+                            <h4 class="text-white font-medium mb-2 leading-tight">Dell XPS 13 Core i7 16GB RAM</h4>
+                            <div class="mt-auto pt-4 flex items-end justify-between">
+                                <div>
+                                    <p class="text-lg font-display font-bold text-meta-mint">₦650,000</p>
+                                </div>
+                                <button onclick="triggerPurchase('Dell XPS 13', '650,000')" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-meta-violet hover:shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all">
+                                    <i class="ph-bold ph-shopping-cart text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Freelancer/Drop-Service Ad UI -->
+                    <div class="glass-panel rounded-xl border border-dashed border-meta-violet overflow-hidden flex flex-col justify-center items-center p-6 text-center bg-meta-violet/5">
+                        <div class="w-16 h-16 rounded-full bg-meta-violet/20 flex items-center justify-center mb-4">
+                            <i class="ph-fill ph-megaphone text-meta-violet text-3xl"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Want to earn?</h4>
+                        <p class="text-xs text-gray-400 mb-4">Share products to your social media. Earn up to 10% commission on escrow sales automatically.</p>
+                        <button class="bg-meta-violet text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-white hover:text-meta-navy transition-colors">Start Drop-Servicing</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 4: DEVELOPER MARKET ================= -->
+            <div id="view-devmarket" class="app-view animate-slide-up">
+                <div class="bg-gradient-to-r from-[#0f172a] to-meta-navy rounded-2xl p-8 mb-8 border border-white/10 flex justify-between items-center">
+                    <div>
+                        <span class="text-meta-violet text-xs font-bold uppercase tracking-wider mb-2 block">The Profile Economy</span>
+                        <h2 class="text-2xl font-display font-bold text-white mb-2">Customize your MetaGie presence.</h2>
+                        <p class="text-sm text-gray-400">Buy custom HTML/Tailwind templates coded by verified Nigerian developers.</p>
+                    </div>
+                    <div class="hidden md:block">
+                        <i class="ph-duotone ph-file-code text-7xl text-white/10"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Theme Card 1 -->
+                    <div class="glass-panel rounded-xl overflow-hidden border border-gray-700 group">
+                        <!-- Preview Box -->
+                        <div class="h-40 bg-[#0f172a] p-4 relative border-b border-gray-800">
+                            <!-- Mini wireframe representation of the theme -->
+                            <div class="w-full h-8 bg-black/50 rounded border border-meta-mint/30 mb-2 flex items-center px-2"><div class="w-4 h-4 rounded-full bg-meta-mint/50"></div></div>
+                            <div class="flex gap-2 h-16">
+                                <div class="w-1/3 h-full bg-black/50 rounded border border-gray-800"></div>
+                                <div class="w-2/3 h-full bg-black/50 rounded border border-gray-800"></div>
+                            </div>
+                            <!-- Overlay -->
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                <button class="bg-white text-meta-navy text-xs font-bold px-4 py-2 rounded-full shadow-lg">Live Preview</button>
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col h-[140px]">
+                            <h4 class="text-white font-bold mb-1 flex justify-between">Cyberpunk UI <span class="text-meta-mint">₦5,000</span></h4>
+                            <p class="text-xs text-gray-500 mb-3">By @DevTunde • HTML, TailwindCSS</p>
+                            <button onclick="triggerPurchase('Cyberpunk UI Theme', '5,000')" class="mt-auto w-full py-2 bg-white/5 border border-white/10 rounded text-sm text-white font-medium hover:bg-meta-violet hover:border-meta-violet transition-colors">Buy via Escrow</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Card 2 -->
+                    <div class="glass-panel rounded-xl overflow-hidden border border-gray-700 group">
+                        <div class="h-40 bg-white p-4 relative border-b border-gray-800">
+                            <!-- Mini wireframe -->
+                            <div class="w-full h-20 bg-gray-100 rounded-lg shadow-sm mb-2"></div>
+                            <div class="w-1/2 h-6 bg-gray-100 rounded"></div>
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                <button class="bg-white text-meta-navy text-xs font-bold px-4 py-2 rounded-full shadow-lg">Live Preview</button>
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col h-[140px]">
+                            <h4 class="text-white font-bold mb-1 flex justify-between">Clean Corporate <span class="text-meta-mint">₦8,500</span></h4>
+                            <p class="text-xs text-gray-500 mb-3">By @ZaraTech • Best for Agencies</p>
+                            <button onclick="triggerPurchase('Corporate Theme', '8,500')" class="mt-auto w-full py-2 bg-white/5 border border-white/10 rounded text-sm text-white font-medium hover:bg-meta-violet hover:border-meta-violet transition-colors">Buy via Escrow</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload CTA -->
+                    <div class="glass-panel rounded-xl border border-dashed border-meta-violet overflow-hidden flex flex-col justify-center items-center p-6 text-center hover:bg-white/5 transition-colors cursor-pointer">
+                        <div class="w-12 h-12 rounded-full bg-meta-violet/20 flex items-center justify-center mb-3">
+                            <i class="ph-bold ph-plus text-meta-violet text-xl"></i>
+                        </div>
+                        <h4 class="text-white font-bold text-sm">Are you a Developer?</h4>
+                        <p class="text-xs text-gray-400 mt-1">Upload your template code, set a price, and earn on every download.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 5: IDEA HUB ================= -->
+            <div id="view-ideahub" class="app-view animate-slide-up">
+                <div class="flex justify-between items-end mb-8 border-b border-gray-800 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-display font-bold text-white">The Idea Hub</h2>
+                        <p class="text-sm text-gray-400">Discover startups seeking funding. Sign NDAs to view full plans.</p>
+                    </div>
+                    <button class="bg-meta-coral text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-white hover:text-meta-coral transition-colors flex items-center gap-2">
+                        <i class="ph-bold ph-plus"></i> Pitch Idea
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Idea Card -->
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-700 flex flex-col">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-display font-bold text-white mb-1">Agri-Drone Logistics</h3>
+                                <p class="text-xs text-gray-500 flex items-center gap-1"><i class="ph-fill ph-user-circle"></i> Founder Verified (NIN)</p>
+                            </div>
+                            <span class="bg-meta-coral/20 text-meta-coral border border-meta-coral/30 px-3 py-1 rounded text-xs font-bold">Seeking ₦5M for 10%</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-300 mb-6 italic border-l-2 border-gray-600 pl-3">"A logistics solution for transporting fresh produce from rural farms to urban markets using autonomous drones."</p>
+                        
+                        <!-- Locked Area -->
+                        <div class="mt-auto bg-gray-900/80 rounded-xl p-6 text-center border border-gray-700 relative overflow-hidden">
+                            <i class="ph-fill ph-lock-key text-3xl text-gray-500 mb-2"></i>
+                            <h4 class="text-white font-bold text-sm">Business Plan is Locked</h4>
+                            <p class="text-xs text-gray-400 mt-1 mb-4">You must sign a digital NDA to view the full Pitch Deck, Financials, and initiate Escrow Funding.</p>
+                            <button onclick="signNDA()" class="bg-white/10 border border-white/20 hover:bg-white hover:text-meta-navy text-white text-sm font-bold px-6 py-2 rounded-lg transition-all">Sign Digital NDA</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Global Escrow Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-panel border border-meta-mint p-4 rounded-xl shadow-[0_10px_40px_rgba(52,211,153,0.2)] flex items-start gap-4 max-w-sm">
+        <div class="w-10 h-10 rounded-full bg-meta-mint/20 flex items-center justify-center flex-shrink-0">
+            <i class="ph-fill ph-shield-check text-meta-mint text-xl"></i>
+        </div>
+        <div>
+            <h4 class="text-white font-bold text-sm" id="toast-title">Escrow Initiated</h4>
+            <p class="text-xs text-gray-400 mt-1" id="toast-desc">Funds have been locked securely. Awaiting seller confirmation.</p>
+        </div>
+        <button onclick="closeToast()" class="text-gray-500 hover:text-white"><i class="ph-bold ph-x"></i></button>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        // Set Date
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        
+        // SPA View Switcher
+        function switchView(viewId) {
+            // Close mobile sidebar if open
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth < 768) {
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+
+            // Hide all views
+            document.querySelectorAll('.app-view').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected view
+            const target = document.getElementById('view-' + viewId);
+            if (target) target.classList.add('active');
+
+            // Update Sidebar UI
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active');
+            });
+            const activeNav = document.getElementById('nav-' + viewId);
+            if (activeNav) activeNav.classList.add('active');
+
+            // Update Header Title dynamically
+            const titles = {
+                'dashboard': 'Ecosystem Dashboard',
+                'wallet': 'Escrow Vault & Wallet',
+                'marketplace': 'Verified Marketplace',
+                'services': 'Expert Service Directory',
+                'ideahub': 'The Idea Hub',
+                'devmarket': 'Developer Profile Market'
+            };
+            document.getElementById('page-title').innerText = titles[viewId] || 'MetaGie';
+            
+            // Scroll top
+            document.querySelector('main > div').scrollTop = 0;
+        }
+
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Mock Escrow Purchase Flow
+        function triggerPurchase(itemName, price) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = `Buying ${itemName}`;
+            document.getElementById('toast-desc').innerText = `₦${price} will be locked in Escrow securely. Confirm?`;
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                closeToast();
+            }, 4000);
+        }
+
+        function closeToast() {
+            document.getElementById('toast').classList.remove('show');
+        }
+
+        function signNDA() {
+            alert("This would trigger a secure cryptographic signing flow linking your verified NIN to a Non-Disclosure Agreement before releasing the document.");
+        }
+    </script>
+</body>
+</html>
