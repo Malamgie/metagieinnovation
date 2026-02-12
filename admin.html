@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaGie Command Center | Admin</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        meta: {
+                            navy: '#0B1120',      // Deep Space Navy
+                            dark: '#0f172a',      // Slightly lighter navy
+                            violet: '#8B5CF6',    // Electric Violet
+                            mint: '#34D399',      // Neo-Mint
+                            coral: '#FB7185',     // Soft Coral
+                            surface: 'rgba(30, 41, 59, 0.7)' // Glass effect base
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0B1120; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.15) 0%, transparent 100%);
+            border-left: 3px solid #8B5CF6;
+            color: #fff;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-meta-navy text-gray-300 font-sans antialiased overflow-hidden h-screen flex">
+
+    <aside class="w-64 bg-meta-navy border-r border-gray-800 flex flex-col z-20 shadow-2xl">
+        <div class="h-20 flex items-center px-6 border-b border-gray-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-meta-violet to-meta-mint flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.5)]">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-white text-lg tracking-wide leading-tight">MetaGie</h1>
+                    <p class="text-[10px] text-meta-mint font-semibold uppercase tracking-wider">Command Center</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 py-6 space-y-1">
+            <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active group flex items-center px-6 py-3 text-sm font-medium hover:bg-white/5 hover:text-white transition-all">
+                <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-meta-violet transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                Overview
+            </a>
+
+            <a href="#" onclick="switchView('verification')" id="nav-verification" class="nav-item group flex items-center justify-between px-6 py-3 text-sm font-medium hover:bg-white/5 hover:text-white transition-all">
+                <div class="flex items-center">
+                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-meta-mint transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Identity Queue
+                </div>
+                <span class="bg-meta-coral/20 text-meta-coral text-xs font-bold px-2 py-0.5 rounded-full">12</span>
+            </a>
+
+            <a href="#" onclick="switchView('disputes')" id="nav-disputes" class="nav-item group flex items-center px-6 py-3 text-sm font-medium hover:bg-white/5 hover:text-white transition-all">
+                <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-red-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+                Dispute Tribunal
+            </a>
+
+            <a href="#" onclick="switchView('hubs')" id="nav-hubs" class="nav-item group flex items-center px-6 py-3 text-sm font-medium hover:bg-white/5 hover:text-white transition-all">
+                <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                State Hubs
+            </a>
+            
+            <div class="px-6 py-4">
+                <div class="h-px bg-gray-800"></div>
+                <p class="text-xs font-semibold text-gray-500 mt-4 uppercase tracking-wider">System</p>
+            </div>
+
+            <a href="#" class="nav-item group flex items-center px-6 py-3 text-sm font-medium hover:bg-white/5 hover:text-white transition-all">
+                <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-yellow-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Escrow Vault
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gray-800 bg-gray-900/50">
+            <div class="flex items-center">
+                <img class="h-9 w-9 rounded-full border border-meta-violet" src="https://ui-avatars.com/api/?name=Aliyu+Garba&background=8B5CF6&color=fff" alt="Admin">
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-white">Aliyu Garba</p>
+                    <p class="text-xs text-gray-400">Super Admin</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-opacity-20 relative">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
+            <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-meta-violet/20 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-meta-mint/10 rounded-full blur-[100px]"></div>
+        </div>
+
+        <header class="h-20 flex items-center justify-between px-8 border-b border-gray-800 backdrop-blur-sm sticky top-0 z-10 bg-meta-navy/80">
+            <div class="flex flex-col">
+                <h2 id="page-title" class="text-xl font-display font-bold text-white tracking-wide">Dashboard Overview</h2>
+                <p id="page-date" class="text-xs text-gray-500">Updating live from Bauchi HQ</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                    <input type="text" class="bg-gray-800/50 border border-gray-700 text-sm rounded-full pl-10 pr-4 py-2 text-gray-300 focus:outline-none focus:border-meta-violet focus:ring-1 focus:ring-meta-violet w-64 transition-all" placeholder="Search user, transaction ID...">
+                </div>
+
+                <button class="relative p-2 text-gray-400 hover:text-white transition-colors">
+                    <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-meta-coral animate-pulse"></span>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <div id="view-dashboard" class="p-8 space-y-8 animate-fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-16 h-16 text-meta-violet" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path></svg>
+                    </div>
+                    <p class="text-sm text-gray-400 font-medium uppercase tracking-wider">Total Users</p>
+                    <h3 class="text-3xl font-display font-bold text-white mt-1">14,205</h3>
+                    <p class="text-xs text-meta-mint mt-2 flex items-center font-semibold">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        +12% this week
+                    </p>
+                </div>
+                
+                <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                         <svg class="w-16 h-16 text-meta-coral" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <p class="text-sm text-gray-400 font-medium uppercase tracking-wider">Active Disputes</p>
+                    <h3 class="text-3xl font-display font-bold text-white mt-1">8</h3>
+                    <p class="text-xs text-meta-coral mt-2 flex items-center font-semibold">Action Required</p>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-16 h-16 text-meta-mint" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <p class="text-sm text-gray-400 font-medium uppercase tracking-wider">Escrow Volume</p>
+                    <h3 class="text-3xl font-display font-bold text-white mt-1">₦4.2M</h3>
+                    <p class="text-xs text-meta-mint mt-2 flex items-center font-semibold">Locked in Vault</p>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group bg-gradient-to-br from-meta-violet/20 to-transparent border-meta-violet/30">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <p class="text-sm text-gray-300 font-medium uppercase tracking-wider">Pending IDs</p>
+                    <h3 class="text-3xl font-display font-bold text-white mt-1">12</h3>
+                    <button onclick="switchView('verification')" class="mt-3 text-xs bg-white text-meta-violet font-bold px-3 py-1 rounded shadow-lg hover:bg-gray-100 transition-colors">Review Now</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 glass-panel rounded-2xl p-6 border border-gray-700">
+                    <h3 class="text-lg font-display font-semibold text-white mb-4">Transaction Velocity (30 Days)</h3>
+                    <div class="h-64">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6 border border-gray-700 flex flex-col">
+                    <h3 class="text-lg font-display font-semibold text-white mb-4">Live Activity</h3>
+                    <div class="flex-1 overflow-y-auto space-y-4 pr-2">
+                        <div class="flex items-start space-x-3 text-sm">
+                            <div class="w-2 h-2 mt-1.5 rounded-full bg-meta-mint"></div>
+                            <div>
+                                <p class="text-gray-300"><span class="text-white font-medium">Usman Danfodio</span> bought "Web Dev Profile"</p>
+                                <p class="text-xs text-gray-500">2 mins ago • ₦5,000</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3 text-sm">
+                            <div class="w-2 h-2 mt-1.5 rounded-full bg-yellow-400"></div>
+                            <div>
+                                <p class="text-gray-300"><span class="text-white font-medium">New Vendor:</span> Amina Textiles (Kano)</p>
+                                <p class="text-xs text-gray-500">14 mins ago • Awaiting Verification</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3 text-sm">
+                            <div class="w-2 h-2 mt-1.5 rounded-full bg-meta-coral"></div>
+                            <div>
+                                <p class="text-gray-300">Dispute opened: Order #TRX-9981</p>
+                                <p class="text-xs text-gray-500">1 hour ago • Bauchi Hub</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-verification" class="p-8 hidden animate-fade-in">
+            <div class="glass-panel rounded-2xl border border-gray-700 overflow-hidden">
+                <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                    <h3 class="text-lg font-display font-semibold text-white">Identity Verification Request (12)</h3>
+                    <div class="flex gap-2">
+                         <button class="px-3 py-1 text-xs font-medium text-gray-400 border border-gray-600 rounded hover:text-white hover:border-white transition-all">Filter: All</button>
+                    </div>
+                </div>
+                
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-800/50 text-gray-400 text-xs uppercase font-medium">
+                        <tr>
+                            <th class="p-4">User</th>
+                            <th class="p-4">Role</th>
+                            <th class="p-4">Document</th>
+                            <th class="p-4">Similarity Score</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-gray-800">
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://ui-avatars.com/api/?name=Ibrahim+Sani&background=random" class="w-8 h-8 rounded-full">
+                                    <div>
+                                        <div class="font-medium text-white">Ibrahim Sani</div>
+                                        <div class="text-xs text-gray-500">ibrahim@gmail.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4"><span class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs">Vendor</span></td>
+                            <td class="p-4 text-gray-300">NIN Slip (Verified)</td>
+                            <td class="p-4"><span class="text-meta-mint font-bold">98% Match</span></td>
+                            <td class="p-4 text-right space-x-2">
+                                <button class="text-gray-400 hover:text-white text-xs underline">View Files</button>
+                                <button class="bg-meta-mint text-meta-navy font-bold px-3 py-1 rounded text-xs hover:bg-white transition-colors">Approve</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://ui-avatars.com/api/?name=Chioma+Eze&background=random" class="w-8 h-8 rounded-full">
+                                    <div>
+                                        <div class="font-medium text-white">Chioma Eze</div>
+                                        <div class="text-xs text-gray-500">chioma.dev@yahoo.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4"><span class="bg-purple-500/20 text-purple-400 px-2 py-1 rounded text-xs">Developer</span></td>
+                            <td class="p-4 text-gray-300">Passport</td>
+                            <td class="p-4"><span class="text-yellow-400 font-bold">75% Match</span></td>
+                            <td class="p-4 text-right space-x-2">
+                                <button class="text-gray-400 hover:text-white text-xs underline">View Files</button>
+                                <button class="bg-meta-mint text-meta-navy font-bold px-3 py-1 rounded text-xs hover:bg-white transition-colors">Approve</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-disputes" class="p-8 hidden animate-fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="glass-panel p-5 rounded-xl border border-meta-coral/30 hover:border-meta-coral transition-colors cursor-pointer active-dispute-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-meta-coral/20 text-meta-coral text-xs font-bold px-2 py-1 rounded">Funds Frozen</span>
+                            <span class="text-xs text-gray-500">ID: #DIS-8821</span>
+                        </div>
+                        <h4 class="text-white font-medium mb-1">Item not delivered: "iPhone 15 Pro"</h4>
+                        <p class="text-sm text-gray-400 mb-4">Buyer claims seller ghosted after payment. Seller claims delivered to park.</p>
+                        <div class="flex justify-between items-center text-xs text-gray-500 border-t border-gray-700 pt-3">
+                            <span>Amount: ₦1,200,000</span>
+                            <span>Bauchi Hub</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl border border-gray-700 flex flex-col h-[600px]">
+                    <div class="p-4 border-b border-gray-700 bg-gray-900/50">
+                        <h4 class="text-white font-medium">Resolution Console #DIS-8821</h4>
+                    </div>
+                    
+                    <div class="flex-1 p-4 space-y-4 overflow-y-auto bg-black/20">
+                        <div class="flex flex-col items-start">
+                            <span class="text-xs text-gray-500 mb-1">Buyer (Musa)</span>
+                            <div class="bg-gray-700 text-gray-200 p-3 rounded-lg rounded-tl-none max-w-xs text-sm">
+                                I waited at Wunti market for 3 hours. No package.
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs text-gray-500 mb-1">Seller (GadgetsNG)</span>
+                            <div class="bg-meta-violet/20 text-white p-3 rounded-lg rounded-tr-none max-w-xs text-sm border border-meta-violet/30">
+                                I sent the waybill number. Check the screenshot.
+                            </div>
+                        </div>
+                        <div class="flex justify-center my-2">
+                             <span class="bg-gray-800 text-gray-500 text-[10px] px-2 py-1 rounded-full">System: Image Uploaded by Seller</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border-t border-gray-700 space-y-3">
+                        <p class="text-xs text-gray-400 text-center">Review evidence carefully. This action is irreversible.</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="w-full py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/50 rounded transition-all text-sm font-medium">Refund Buyer</button>
+                            <button class="w-full py-2 bg-green-500/20 text-green-400 hover:bg-green-500 hover:text-white border border-green-500/50 rounded transition-all text-sm font-medium">Release to Seller</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="view-hubs" class="p-8 hidden animate-fade-in">
+             <div class="glass-panel rounded-2xl p-8 text-center border border-dashed border-gray-700">
+                 <div class="w-20 h-20 bg-gray-800 rounded-full mx-auto flex items-center justify-center mb-4">
+                     <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                 </div>
+                 <h3 class="text-xl font-display font-bold text-white">Hub Network Map</h3>
+                 <p class="text-gray-400 mt-2 max-w-md mx-auto">Interactive map integration pending. Currently managing 36 State Hubs via API.</p>
+                 <button class="mt-6 bg-meta-violet text-white px-6 py-2 rounded-full font-medium hover:bg-meta-violet/80 transition-colors">View Bauchi HQ Details</button>
+             </div>
+        </div>
+
+    </main>
+
+    <script>
+        // 1. Chart.js Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            
+            // Gradient Fill for Chart
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(139, 92, 246, 0.5)'); // Violet
+            gradient.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
+
+            const mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1st', '5th', '10th', '15th', '20th', '25th', '30th'],
+                    datasets: [{
+                        label: 'Transactions',
+                        data: [120, 190, 150, 220, 180, 250, 310],
+                        borderColor: '#8B5CF6',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+            
+            // Set Date
+            document.getElementById('page-date').innerText = new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        });
+
+        // 2. SPA View Switcher
+        function switchView(viewId) {
+            // Hide all views
+            const views = ['dashboard', 'verification', 'disputes', 'hubs'];
+            views.forEach(id => {
+                const el = document.getElementById('view-' + id);
+                if(el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('animate-fade-in'); // Reset anim
+                }
+            });
+
+            // Show selected view
+            const activeEl = document.getElementById('view-' + viewId);
+            activeEl.classList.remove('hidden');
+            void activeEl.offsetWidth; // Trigger reflow to restart animation
+            activeEl.classList.add('animate-fade-in');
+
+            // Update Header Title
+            const titles = {
+                'dashboard': 'Dashboard Overview',
+                'verification': 'Verification Queue',
+                'disputes': 'Dispute Tribunal',
+                'hubs': 'State Hub Network'
+            };
+            document.getElementById('page-title').innerText = titles[viewId];
+
+            // Update Sidebar Active State
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active', 'border-l-3', 'border-meta-violet');
+                nav.classList.remove('text-white'); // basic reset
+            });
+            
+            const activeNav = document.getElementById('nav-' + viewId);
+            if(activeNav) {
+                activeNav.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
