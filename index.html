@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaGie Innovations | The Adaptive Future</title>
+    
+    <!-- Fonts: Space Grotesk (Headings) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons (Premium Tech Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- MetaGie Theme Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        meta: {
+                            navy: '#0B1120',      
+                            dark: '#0f172a',      
+                            violet: '#8B5CF6',    
+                            mint: '#34D399',      
+                            coral: '#FB7185',     
+                            surface: 'rgba(30, 41, 59, 0.4)' 
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base styles & Custom Scrollbar */
+        body { background-color: #0B1120; color: #cbd5e1; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0B1120; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
+
+        /* Glass & Gradient Utilities */
+        .glass { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card:hover { border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.2); }
+        .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Scroll Reveal Utility */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="antialiased selection:bg-meta-violet selection:text-white relative">
+
+    <!-- Ambient Background Glows -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-meta-violet/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-[400px] h-[400px] bg-meta-mint/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-[600px] h-[600px] bg-meta-coral/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="fixed w-full z-50 glass border-b-0 border-white/5 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-meta-violet to-meta-mint flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <span class="font-display font-bold text-white text-xl tracking-wide">MetaGie</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#ecosystem" class="text-sm font-medium hover:text-meta-mint transition-colors">Ecosystem</a>
+                    <a href="#developer" class="text-sm font-medium hover:text-meta-violet transition-colors">Developer Market</a>
+                    <a href="#ideahub" class="text-sm font-medium hover:text-meta-coral transition-colors">Idea Hub</a>
+                    <a href="#trust" class="text-sm font-medium hover:text-white transition-colors">Trust & Escrow</a>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="auth.html" class="text-sm font-medium text-white hover:text-meta-mint transition-colors">Sign In</a>
+                    <a href="auth.html" class="px-5 py-2.5 rounded-full text-sm font-bold bg-white text-meta-navy hover:bg-meta-mint hover:text-meta-navy transition-all shadow-[0_0_15px_rgba(52,211,153,0.3)]">Get Verified</a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-gray-300 hover:text-white focus:outline-none">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= HERO SECTION ================= -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full glass border-meta-violet/30 text-meta-violet text-xs font-semibold uppercase tracking-wider mb-6 animate-fade-in-up">
+                <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-meta-mint opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-meta-mint"></span></span>
+                The National Digital Ecosystem
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-display font-bold text-white tracking-tight mb-8 leading-tight animate-fade-in-up" style="animation-delay: 0.1s;">
+                Nigeria's Economy,<br>
+                <span class="bg-gradient-to-r from-meta-violet via-meta-mint to-meta-coral text-gradient">Powered by Trust.</span>
+            </h1>
+            
+            <p class="mt-4 text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-10 animate-fade-in-up" style="animation-delay: 0.2s;">
+                Shop safely, hire verified talent, invest in ideas, and travel securely. All your digital transactions protected by our State Hubs and Escrow Vault.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style="animation-delay: 0.3s;">
+                <a href="auth.html" class="w-full sm:w-auto px-8 py-4 rounded-full text-base font-bold bg-gradient-to-r from-meta-violet to-indigo-600 text-white hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+                    Enter Ecosystem <i class="ph-bold ph-arrow-right"></i>
+                </a>
+                <a href="#ecosystem" class="w-full sm:w-auto px-8 py-4 rounded-full text-base font-bold glass text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2 border border-gray-600">
+                    Explore Modules <i class="ph-bold ph-caret-down"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- UI Mockup Teaser -->
+        <div class="mt-16 max-w-5xl mx-auto px-6 lg:px-8 relative z-10 animate-fade-in-up" style="animation-delay: 0.5s;">
+            <div class="rounded-2xl glass border border-gray-700/50 p-2 shadow-2xl relative">
+                <div class="absolute inset-0 bg-gradient-to-t from-meta-navy via-transparent to-transparent z-10 rounded-2xl"></div>
+                <img src="https://images.unsplash.com/photo-1618761714954-0b8cd0026356?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="Platform Interface" class="rounded-xl opacity-50 contrast-125 mix-blend-luminosity">
+                
+                <!-- Floating Glass Cards on Mockup -->
+                <div class="absolute top-1/4 left-10 glass p-4 rounded-xl border-meta-mint/30 z-20 hidden md:block animate-bounce" style="animation-duration: 3s;">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-meta-mint/20 flex items-center justify-center"><i class="ph-fill ph-check-circle text-meta-mint text-xl"></i></div>
+                        <div>
+                            <p class="text-white text-sm font-bold">Escrow Secured</p>
+                            <p class="text-xs text-gray-400">₦150,000 Locked</p>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="absolute bottom-1/4 right-10 glass p-4 rounded-xl border-meta-violet/30 z-20 hidden md:block animate-bounce" style="animation-duration: 4s;">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-meta-violet/20 flex items-center justify-center"><i class="ph-fill ph-identification-card text-meta-violet text-xl"></i></div>
+                        <div>
+                            <p class="text-white text-sm font-bold">Profile Verified</p>
+                            <p class="text-xs text-gray-400">Bauchi State Hub</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= STATS / TRUST BAR ================= -->
+    <div class="border-y border-white/5 bg-white/[0.02] relative z-20">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-800">
+                <div class="reveal">
+                    <p class="text-3xl font-display font-bold text-white">36</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">State Hubs</p>
+                </div>
+                <div class="reveal" style="transition-delay: 100ms;">
+                    <p class="text-3xl font-display font-bold text-meta-mint">100%</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Escrow Protection</p>
+                </div>
+                <div class="reveal" style="transition-delay: 200ms;">
+                    <p class="text-3xl font-display font-bold text-white">NIN</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Verified Users</p>
+                </div>
+                <div class="reveal" style="transition-delay: 300ms;">
+                    <p class="text-3xl font-display font-bold text-meta-violet">0</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Tolerance for Fraud</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= THE ECOSYSTEM (CORE MODULES) ================= -->
+    <section id="ecosystem" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <h2 class="text-meta-mint font-semibold tracking-wide uppercase text-sm mb-2">6 Pillars of Innov8ion</h2>
+                <h3 class="text-3xl md:text-5xl font-display font-bold text-white mb-4">One Platform. Infinite Possibilities.</h3>
+                <p class="text-gray-400">MetaGie replaces fragmented, risky websites with a single, unified digital home for every Nigerian.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Module 1 -->
+                <div class="glass glass-card rounded-2xl p-8 transition-all duration-300 reveal">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center mb-6 border border-blue-500/30">
+                        <i class="ph-fill ph-shopping-cart text-3xl text-blue-400"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-white mb-3">Shop From Home</h4>
+                    <p class="text-sm text-gray-400 mb-4">Buy goods securely. Payments are held in escrow until delivery is confirmed. No more "what I ordered vs what I got."</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-meta-mint"></i> Verified Vendors</li>
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-meta-mint"></i> Installment Options</li>
+                    </ul>
+                </div>
+
+                <!-- Module 2 -->
+                <div class="glass glass-card rounded-2xl p-8 transition-all duration-300 reveal" style="transition-delay: 100ms;">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center mb-6 border border-orange-500/30">
+                        <i class="ph-fill ph-toolbox text-3xl text-orange-400"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-white mb-3">Expert Services</h4>
+                    <p class="text-sm text-gray-400 mb-4">Find trusted local plumbers, mechanics, and electricians. Every artisan is ID-verified and rated by the community.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-meta-mint"></i> State Hub Vetted</li>
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-meta-mint"></i> Dispute Resolution</li>
+                    </ul>
+                </div>
+
+                <!-- Module 3 -->
+                <div class="glass glass-card rounded-2xl p-8 transition-all duration-300 reveal" style="transition-delay: 200ms;">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-meta-mint/20 to-green-600/10 flex items-center justify-center mb-6 border border-meta-mint/30">
+                        <i class="ph-fill ph-briefcase text-3xl text-meta-mint"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-white mb-3">Verified Talent Hub</h4>
+                    <p class="text-sm text-gray-400 mb-4">Post jobs or hire freelancers based on skill, not guesswork. Built-in skill tests verify abilities directly on profiles.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-meta-mint"></i> Drop-Service Networking</li>
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-meta-mint"></i> Secure Payouts</li>
+                    </ul>
+                </div>
+
+                <!-- Module 4 -->
+                <div class="glass glass-card rounded-2xl p-8 transition-all duration-300 reveal">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 flex items-center justify-center mb-6 border border-yellow-500/30">
+                        <i class="ph-fill ph-airplane-tilt text-3xl text-yellow-400"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-white mb-3">Global Travel</h4>
+                    <p class="text-sm text-gray-400 mb-4">Book flights and visa services with confidence. Agents get paid only after service delivery, stopping travel fraud completely.</p>
+                </div>
+
+                <!-- Module 5 (Highlight) -->
+                <div class="glass glass-card rounded-2xl p-8 transition-all duration-300 border-meta-violet/50 reveal relative overflow-hidden group" style="transition-delay: 100ms;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-meta-violet/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-meta-violet/30 to-purple-600/20 flex items-center justify-center mb-6 border border-meta-violet">
+                        <i class="ph-fill ph-code-block text-3xl text-meta-violet"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-white mb-3">Developer Economy</h4>
+                    <p class="text-sm text-gray-400 mb-4">Developers code and sell stunning profile layouts. Users buy them to customize their MetaGie presence.</p>
+                    <a href="#developer" class="text-xs font-bold text-meta-violet hover:text-white transition-colors flex items-center gap-1">Learn More <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+
+                <!-- Module 6 (Highlight) -->
+                <div class="glass glass-card rounded-2xl p-8 transition-all duration-300 border-meta-coral/50 reveal relative overflow-hidden group" style="transition-delay: 200ms;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-meta-coral/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-meta-coral/30 to-red-600/20 flex items-center justify-center mb-6 border border-meta-coral">
+                        <i class="ph-fill ph-lightbulb-filament text-3xl text-meta-coral"></i>
+                    </div>
+                    <h4 class="text-xl font-display font-bold text-white mb-3">The Idea Hub</h4>
+                    <p class="text-sm text-gray-400 mb-4">Pitch your startup ideas, sign digital NDAs, and secure funding or partnerships from verified investors.</p>
+                    <a href="#ideahub" class="text-xs font-bold text-meta-coral hover:text-white transition-colors flex items-center gap-1">Learn More <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= FEATURE DEEP-DIVE: DEVELOPER ECONOMY ================= -->
+    <section id="developer" class="py-24 relative z-10 bg-black/40 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <!-- Image/Visual -->
+                <div class="w-full lg:w-1/2 reveal">
+                    <div class="relative rounded-2xl p-2 bg-gradient-to-r from-meta-violet to-indigo-600">
+                        <div class="bg-meta-navy rounded-xl p-6 h-full border border-white/10 overflow-hidden relative">
+                            <!-- Code block visual -->
+                            <div class="flex gap-2 mb-4">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-meta-mint"></div>
+                            </div>
+                            <pre class="text-xs text-meta-mint font-mono leading-relaxed">
+<code><span class="text-meta-violet">export const</span> <span class="text-blue-400">NeonProfileTemplate</span> = () => {
+  <span class="text-meta-violet">return</span> (
+    &lt;<span class="text-meta-coral">div</span> <span class="text-yellow-300">className</span>=<span class="text-green-300">"bg-dark shadow-neon"</span>&gt;
+      &lt;<span class="text-meta-coral">Header</span> <span class="text-yellow-300">user</span>={<span class="text-white">userData</span>} /&gt;
+      &lt;<span class="text-meta-coral">PortfolioGrid</span> <span class="text-yellow-300">theme</span>=<span class="text-green-300">"cyberpunk"</span> /&gt;
+    &lt;/<span class="text-meta-coral">div</span>&gt;
+  );
+};
+// Published to MetaGie Marketplace
+// Price: ₦5,000</code></pre>
+                            
+                            <!-- Overlay UI -->
+                            <div class="absolute bottom-4 right-4 glass px-4 py-2 rounded-lg flex items-center gap-3 border border-meta-mint/50">
+                                <img src="https://ui-avatars.com/api/?name=Dev+Alex&background=random" class="w-8 h-8 rounded-full">
+                                <div>
+                                    <p class="text-xs text-white font-bold">Template Sold!</p>
+                                    <p class="text-[10px] text-meta-mint">+₦4,500 to Wallet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Text Content -->
+                <div class="w-full lg:w-1/2 reveal">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-meta-violet/20 text-meta-violet text-xs font-bold mb-4">
+                        <i class="ph-bold ph-code"></i> For Creators
+                    </div>
+                    <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">Design. Code. Sell.</h3>
+                    <p class="text-gray-400 mb-6">
+                        We are gamifying the digital identity. Developers can write custom HTML/CSS/Tailwind templates in our Sandbox and publish them to the Profile Market. 
+                    </p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0"><i class="ph-bold ph-paint-brush text-white text-sm"></i></div>
+                            <div>
+                                <h5 class="text-white font-semibold">Users stand out</h5>
+                                <p class="text-sm text-gray-500">Businesses and individuals buy profiles to look professional and unique.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0"><i class="ph-bold ph-currency-ngn text-white text-sm"></i></div>
+                            <div>
+                                <h5 class="text-white font-semibold">Developers earn passively</h5>
+                                <p class="text-sm text-gray-500">Every time your template is bought or gifted, funds drop into your escrow wallet instantly.</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <a href="auth.html" class="text-meta-violet font-semibold hover:text-white transition-colors flex items-center gap-2">Join the Dev Sandbox <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= FEATURE DEEP-DIVE: IDEA HUB ================= -->
+    <section id="ideahub" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-16">
+                <!-- Image/Visual -->
+                <div class="w-full lg:w-1/2 reveal">
+                    <div class="glass rounded-2xl p-6 border border-meta-coral/30 relative shadow-[0_0_50px_rgba(251,113,133,0.1)]">
+                        <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
+                            <h4 class="text-white font-display font-bold">AgriTech Drone Delivery</h4>
+                            <span class="bg-meta-coral/20 text-meta-coral text-xs px-2 py-1 rounded font-bold">Seeking: ₦5M for 10%</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">A logistics solution for transporting fresh produce from rural farms to urban markets using autonomous drones.</p>
+                        
+                        <!-- Blur block -->
+                        <div class="relative">
+                            <div class="absolute inset-0 backdrop-blur-md bg-meta-navy/50 flex flex-col items-center justify-center rounded-lg border border-gray-700 z-10">
+                                <i class="ph-fill ph-lock-key text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-sm text-white font-bold">Full Business Plan Hidden</p>
+                                <button class="mt-3 bg-white text-meta-navy text-xs font-bold px-4 py-2 rounded-full hover:bg-gray-200 transition-colors">Sign NDA to View</button>
+                            </div>
+                            <div class="space-y-2 opacity-30 select-none">
+                                <div class="h-2 bg-gray-600 rounded w-full"></div>
+                                <div class="h-2 bg-gray-600 rounded w-5/6"></div>
+                                <div class="h-2 bg-gray-600 rounded w-4/6"></div>
+                                <div class="h-2 bg-gray-600 rounded w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Text Content -->
+                <div class="w-full lg:w-1/2 reveal">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-meta-coral/20 text-meta-coral text-xs font-bold mb-4">
+                        <i class="ph-bold ph-lightbulb"></i> The Idea Hub
+                    </div>
+                    <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">Pitch Ideas. Protect IP. Get Funded.</h3>
+                    <p class="text-gray-400 mb-6">
+                        Stop worrying about idea theft. The MetaGie Idea Hub allows you to post teasers of your business plans. Investors must digitally sign an NDA before they can see the full details or initiate escrow funding.
+                    </p>
+                    <ul class="text-sm text-gray-400 space-y-3 mb-8">
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-meta-coral"></i> Timestamped Intellectual Property protection.</li>
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-meta-coral"></i> Secure smart-contract investments.</li>
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-meta-coral"></i> Co-founder matching through verified profiles.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= CTA / FOOTER PRE-AMBLE ================= -->
+    <section class="py-24 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 text-center reveal">
+            <div class="glass rounded-3xl p-10 md:p-16 border border-white/10 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-meta-violet/20 via-meta-mint/10 to-transparent z-0"></div>
+                
+                <div class="relative z-10">
+                    <h2 class="text-3xl md:text-5xl font-display font-bold text-white mb-6">Be Part of the Verification Era.</h2>
+                    <p class="text-gray-300 mb-10 text-lg">Whether you are buying, selling, coding, or inventing—MetaGie Innovations is your safe harbor.</p>
+                    <a href="auth.html" class="inline-block px-10 py-4 rounded-full text-lg font-bold bg-white text-meta-navy hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                        Create Your Free Account
+                    </a>
+                    <p class="mt-4 text-xs text-gray-500">Requires Valid NIN for Verification</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="bg-black/60 border-t border-white/5 pt-16 pb-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                <!-- Brand Info -->
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded bg-gradient-to-br from-meta-violet to-meta-mint flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <span class="font-display font-bold text-white text-lg">MetaGie</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">Connecting People. Powering Nations. Founded by Aliyu Garba Musa.</p>
+                    <div class="flex gap-4 text-gray-400">
+                        <a href="#" class="hover:text-white"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                        <a href="#" class="hover:text-white"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                        <a href="#" class="hover:text-white"><i class="ph-fill ph-instagram-logo text-xl"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Links -->
+                <div>
+                    <h4 class="text-white font-bold mb-4">Ecosystem</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-meta-mint">Marketplace</a></li>
+                        <li><a href="#" class="hover:text-meta-mint">Expert Services</a></li>
+                        <li><a href="#" class="hover:text-meta-mint">Talent Hub</a></li>
+                        <li><a href="#" class="hover:text-meta-mint">Travel & Visas</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-4">Innovations</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-meta-violet">Developer Profile Market</a></li>
+                        <li><a href="#" class="hover:text-meta-violet">The Idea Hub</a></li>
+                        <li><a href="#" class="hover:text-meta-violet">Freelance Drop-Service</a></li>
+                        <li><a href="#" class="hover:text-meta-violet">Escrow Logic</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Governance</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white">Find a State Hub</a></li>
+                        <li><a href="#" class="hover:text-white">Dispute Resolution</a></li>
+                        <li><a href="#" class="hover:text-white">Verification Process</a></li>
+                        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+                <p>&copy; 2026 MetaGie Innovations. All rights reserved.</p>
+                <p class="flex items-center gap-1">Powered by <span class="font-bold text-white">MetaGie Technology</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS for Scroll Animations and Navbar effect -->
+    <script>
+        // Navbar blur effect on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('bg-meta-navy/80', 'backdrop-blur-xl', 'shadow-lg');
+                navbar.classList.remove('border-b-0');
+            } else {
+                navbar.classList.remove('bg-meta-navy/80', 'backdrop-blur-xl', 'shadow-lg');
+                navbar.classList.add('border-b-0');
+            }
+        });
+
+        // Intersection Observer for Scroll Reveals
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealCallback = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // Optional: stop observing once revealed
+                    // observer.unobserve(entry.target); 
+                }
+            });
+        };
+
+        const revealOptions = {
+            threshold: 0.15, // Trigger when 15% visible
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealObserver = new IntersectionObserver(revealCallback, revealOptions);
+        
+        revealElements.forEach(el => revealObserver.observe(el));
+    </script>
+</body>
+</html>
